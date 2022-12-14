@@ -934,7 +934,7 @@ drawbar(Monitor *m)
 	int x, w, tw = 0, stw = 0;
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
-	unsigned int i, occ = 0, urg = 0;
+	unsigned int i, occ = 0, urg = 0, cc = 0;
 	Client *c;
 
 	if (!m->showbar)
@@ -950,6 +950,7 @@ drawbar(Monitor *m)
 
 	resizebarwin(m);
 	for (c = m->clients; c; c = c->next) {
+                if (ISVISIBLE(c)) cc++; /* visible client count, used later */
 		occ |= c->tags;
 		if (c->isurgent)
 			urg |= c->tags;
@@ -969,17 +970,33 @@ drawbar(Monitor *m)
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
-	if ((w = m->ww - tw - stw - x) > bh) {
-		if (m->sel) {
-			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
-			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
-			if (m->sel->isfloating)
-				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
-		} else {
-			drw_setscheme(drw, scheme[SchemeNorm]);
-			drw_rect(drw, x, 0, w, bh, 1, 1);
-		}
-	}
+	if ((w = m->ww - tw - stw - x) > bh && cc > 0) {
+                for (c = m->clients; c; c = c->next) {
+                        if (ISVISIBLE(c)) {
+                            if (c == m->sel) {
+                                    drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+                                    x = drw_text(drw, x, 0, w / cc, bh, lrpad / 2, c->name, 0);
+                            } else {
+                                    drw_setscheme(drw, scheme[SchemeNorm]);
+                                    x = drw_text(drw, x, 0, w / cc, bh, lrpad / 2, c->name, 0);
+                            }
+                            /* TODO add floating indicator */
+                        }
+                }
+		/* if (m->sel) { */
+		/* 	drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]); */
+		/* 	drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0); */
+		/* 	if (m->sel->isfloating) */
+		/* 		drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0); */
+		/* } else { */
+		/* 	drw_setscheme(drw, scheme[SchemeNorm]); */
+		/* 	drw_rect(drw, x, 0, w, bh, 1, 1); */
+		/* } */
+	} else if (cc == 0) {
+                drw_setscheme(drw, scheme[SchemeNorm]);
+ 		drw_rect(drw, x, 0, w, bh, 1, 1);
+        }
+
 	drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);
 }
 
