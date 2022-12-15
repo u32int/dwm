@@ -859,7 +859,8 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 
 	w += 2; /* 1px padding on both sides */
 	ret = m->ww - w;
-	x = m->ww - w - getsystraywidth();
+	x = m->ww - w;
+        if (m == systraytomon(m)) x -= getsystraywidth();
 
 	drw_setscheme(drw, scheme[LENGTH(colors)]);
 	drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
@@ -943,10 +944,8 @@ drawbar(Monitor *m)
 	if(showsystray && m == systraytomon(m) && !systrayonleft)
 		stw = getsystraywidth();
 
-	/* draw status first so it can be overdrawn by tags later */
-	if (m == selmon) { /* status is only drawn on selected monitor */
-		tw = m->ww - drawstatusbar(m, bh, stext);
-	}
+        /* draw status first so it can be overdrawn by tags later */
+        tw = m->ww - drawstatusbar(m, bh, stext);
 
 	resizebarwin(m);
 	for (c = m->clients; c; c = c->next) {
@@ -980,7 +979,6 @@ drawbar(Monitor *m)
                                     drw_setscheme(drw, scheme[SchemeNorm]);
                                     x = drw_text(drw, x, 0, w / cc, bh, lrpad / 2, c->name, 0);
                             }
-                            /* TODO add floating indicator */
                         }
                 }
 		/* if (m->sel) { */
@@ -994,7 +992,7 @@ drawbar(Monitor *m)
 		/* } */
 	} else if (cc == 0) {
                 drw_setscheme(drw, scheme[SchemeNorm]);
- 		drw_rect(drw, x, 0, w, bh, 1, 1);
+                drw_rect(drw, x, 0, w, bh, 1, 1);
         }
 
 	drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);
@@ -1175,7 +1173,7 @@ getsystraywidth()
 	Client *i;
 	if(showsystray)
 		for(i = systray->icons; i; w += i->w + systrayspacing, i = i->next) ;
-	return w ? w + systrayspacing : 1;
+	return w ? w + systrayspacing : 0;
 }
 
 int
