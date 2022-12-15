@@ -1,5 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
+#include <X11/XF86keysym.h>
+
 /* appearance */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
@@ -57,7 +59,7 @@ static const Layout layouts[] = {
 };
 
 /* key definitions */
-#define MODKEY Mod1Mask
+#define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG) \
 	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
@@ -68,8 +70,23 @@ static const Layout layouts[] = {
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-static const char *dmenucmd[] = { "dmenu_run", "-fn", dmenufont, "-nb", col_black, "-nf", col_gray3, "-sb", col_gray1, "-sf", col_gray4, NULL };
-static const char *termcmd[]  = { "st", NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-i", "-fn", dmenufont, "-nb", col_black, "-nf", col_gray3, "-sb", col_gray1, "-sf", col_gray4, NULL };
+static const char *termcmd[]  = { "st", "-e", "fish", NULL };
+static const char *browsercmd[]  = { "firefox", NULL };
+
+static const char *actuallyquit[] = { "pkill", "-f", "execdwm.sh", NULL };
+
+// maim screenshots
+static const char scr_clipselect[] = "maim -s | xclip -selection clipboard -t image/png";
+static const char scr_filefull[] = "maim ~/img/screen/$(date +%s).png";
+
+// audio
+static const char *upvol[]   = { "/usr/bin/pactl", "set-sink-volume", "0", "+5%",     NULL };
+static const char *downvol[] = { "/usr/bin/pactl", "set-sink-volume", "0", "-5%",     NULL };
+static const char *mutevol[] = { "/usr/bin/pactl", "set-sink-mute",   "0", "toggle",  NULL };
+static const char *playerctlnextcmd[] = {"playerctl", "next", NULL };
+static const char *playerctlprevcmd[] = {"playerctl", "previous", NULL };
+static const char *playerctlplaypausecmd[] = {"playerctl", "play-pause", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -108,7 +125,21 @@ static const Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_p,      quit,           {0} },
+	{ MODKEY|ShiftMask,             XK_r,      quit,           {0} },
+	{ MODKEY,                       XK_i,      spawn,          {.v = browsercmd } },
+        // Screenshots
+	{ MODKEY|ShiftMask,             XK_s,      spawn,          SHCMD(scr_clipselect) },
+	{ MODKEY|ShiftMask,             XK_c,      spawn,          SHCMD(scr_filefull) },
+	// Reload without killing X
+	{ MODKEY|ShiftMask,             XK_r,      quit,           {0} }, // reload
+	{ MODKEY|ShiftMask,             XK_y,      spawn,          {.v = actuallyquit } },
+	// Audio
+	{ 0,                       XF86XK_AudioLowerVolume, spawn, {.v = downvol } },
+	{ 0,                       XF86XK_AudioMute, spawn, {.v = mutevol } },
+	{ 0,                       XF86XK_AudioRaiseVolume, spawn, {.v = upvol   } },
+	{ 0,                       XF86XK_AudioNext, spawn, {.v = playerctlnextcmd } },
+	{ 0,                       XF86XK_AudioPrev, spawn, {.v = playerctlprevcmd   } },
+	{ 0,                       XF86XK_AudioPlay, spawn, {.v = playerctlplaypausecmd   } },
 };
 
 /* button definitions */
