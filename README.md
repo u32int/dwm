@@ -1,13 +1,16 @@
-dwm - dynamic window manager
-============================
-dwm is an extremely fast, small, and dynamic window manager for X.
+## dwm (dynamic window manager)
 
+My fork of the popular <a href="https://dwm.suckless.org/">suckless dwm</a>.
+Best used with <a href="https://github.com/u32int/dmenu">dmenu</a> and <a href="https://github.com/u32int/st">st</a>.
 
-Requirements
-------------
-In order to build dwm you need the Xlib header files.
+**Notable changes**
+ - all the patches in ```/patches```
+ - more awesomewm-like bar (shows all visible window names etc.)
+ - multi-monitor systray fix
 
+### The original README
 
+```
 Installation
 ------------
 Edit config.mk to match your local setup (dwm is installed into
@@ -46,3 +49,4 @@ Configuration
 -------------
 The configuration of dwm is done by creating a custom config.h
 and (re)compiling the source code.
+```
