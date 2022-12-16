@@ -16,6 +16,7 @@ static const int showsystray        = 1;     /* 0 means no systray */
 static const char *fonts[]          = { "Iosevka:size=13" };
 static const char dmenufont[]       = "Iosevka:size=13";
 
+static const char col_white[]       = "#f5f5f5";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -70,7 +71,7 @@ static const Layout layouts[] = {
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-static const char *dmenucmd[] = { "dmenu_run", "-i", "-fn", dmenufont, "-nb", col_black, "-nf", col_gray3, "-sb", col_gray1, "-sf", col_gray4, NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-i", "-fn", dmenufont, "-nb", col_black, "-nf", col_gray3, "-sb", col_gray1, "-sf", col_gray4, "-shb", col_gray1, "-shf", col_white, "-nhb", col_black, "-nhf", col_white, NULL };
 static const char *termcmd[]  = { "st", "-e", "fish", NULL };
 static const char *browsercmd[]  = { "firefox", NULL };
 
