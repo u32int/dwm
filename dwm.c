@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <X11/cursorfont.h>
@@ -945,7 +946,17 @@ drawbar(Monitor *m)
 		stw = getsystraywidth();
 
         /* draw status first so it can be overdrawn by tags later */
-        tw = m->ww - drawstatusbar(m, bh, stext);
+        if (m == selmon) {
+                tw = m->ww - drawstatusbar(m, bh, stext);
+        } else {
+                /* if not on the selected monitor, only draw the time. */
+                #define TBUFF_SIZE 128
+                char tbuff[TBUFF_SIZE] = { 0 };
+                time_t t = time(NULL);
+                if (!strftime(tbuff, TBUFF_SIZE, "[%d/%b/%Y %H:%M]", localtime(&t)))
+                        die("strftime");
+                tw = m->ww - drawstatusbar(m, bh, tbuff);
+        }
 
 	resizebarwin(m);
 	for (c = m->clients; c; c = c->next) {
